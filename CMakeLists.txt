@@ -1,7 +1,7 @@
 cmake_minimum_required (VERSION 3.20)
 
-set(TARGET_NAME "day1")
-project ("Day1" VERSION 0.0.1)
+set(TARGET_NAME "day2")
+project ("Day2" VERSION 0.0.1)
 
 add_executable(${TARGET_NAME} main.cpp)
 
