@@ -54,30 +54,19 @@ GameInfo parseLine(std::string& line) {
         });
 
         if(name == "green") {
-            if(number <= 13) {
-                curGame.green += number;
-                fmt::print("possible\t{} {} {}\n", name, number, curGame.green);
-            }else{
-                fmt::print("not possible\t{} {} {}\n", name, number, curGame.green);
-                return GameInfo{};
-            }
+            if(number >= curGame.green) curGame.green = number;
+            fmt::print("bigger found:\t{} {} {}\n", name, number, curGame.green);
 
         } else if(name == "red") {
-            if(number <= 12) {
-                curGame.red += number;
-                fmt::print("possible\t{} {} {}\n", name, number, curGame.red);
+            if(number >= curGame.red) {
+                curGame.red = number;
+                fmt::print("bigger found:\t{} {} {}\n", name, number, curGame.red);
             }
-            else{
-                fmt::print("not possible\t{} {} {}\n", name, number, curGame.red);
-                return GameInfo{};
-            }
+
         } else if(name == "blue") {
-            if(number <= 14) {
-                curGame.blue += number;
-                fmt::print("possible\t{} {} {}\n", name, number, curGame.blue);
-            }else{
-                fmt::print("not possible\t{} {} {}\n", name, number, curGame.blue);
-                return GameInfo{};
+            if(number >= curGame.blue) {
+                curGame.blue = number;
+                fmt::print("bigger found:\t{} {} {}\n", name, number, curGame.blue);
             }
         } else if(name == "game") {
             curGame.id = number;
@@ -111,27 +100,13 @@ int main() {
         playedGames.push_back(parseLine(line));
     }
     fmt::print("");
-    GameInfo combinedGames{};
-    for(auto const& games : playedGames) {
-        if(games.red > 0  && games.green > 0 && games.blue > 0) {
-            fmt::print("possible\t");
-            fmt::print(
-              "id {}, red {} blue {} green {}\n",
-              games.id,
-              games.red,
-              games.blue,
-              games.green);
-
-            combinedGames.id += games.id;
-        } else {
-            fmt::print("not possible\t");
-            fmt::print(
-              "id {}, red {} blue {} green {}\n",
-              games.id,
-              games.red,
-              games.blue,
-              games.green);
-        }
+    GameInfo     combinedGames{};
+    unsigned int powerOfGame{1};
+    unsigned int sumOfAll{};
+    for(auto const& game : playedGames) {
+        fmt::print("id {}, red {} blue {} green {}\n", game.id, game.red, game.blue, game.green);
+        powerOfGame = game.red * game.blue * game.green;
+        sumOfAll    += powerOfGame;
     }
-    fmt::print("result: {}\n", combinedGames.id);
+    fmt::print("result: {}\n", sumOfAll);
 }
