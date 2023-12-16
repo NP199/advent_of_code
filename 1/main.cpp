@@ -4,6 +4,7 @@
 #include <fstream>
 #include <string>
 #include <vector>
+#include <variant>
 
 /*
     * Herausfinden welche Zahlen Kontakt haben mit einem Symbol
@@ -17,9 +18,9 @@
     */
 
 struct partType {
-    std::string               parsedSign;
+    std::variant<char, unsigned int>  parsedSign;
     unsigned int position;
-    bool                      partNumberFlag;
+    bool         partNumberFlag;
 };
 
 int main() {
@@ -35,37 +36,29 @@ int main() {
 
     auto parseFunction = [&](std::string const& str) {
         partType tempSign;
+        //get the numbers and characters
         for(std::size_t i = 0; auto const& character : str) {
-            if(!std::ispunct(character)) {
-                //gefunden Partnumber
-                //fmt::print("{}\n",character);
-                tempSign.parsedSign     = character;
+            if(std::isdigit(character)) {
+                //gefundene Zahl cast to ASCII - ASCII '0' to get int value
+                tempSign.parsedSign.emplace<unsigned int>(static_cast<unsigned int>(character - '0'));
+                //fmt::print("foo: {}\n", std::get<1>(tempSign.parsedSign));
                 tempSign.position       = i;
                 tempSign.partNumberFlag = true;
                 parsedSigns.push_back(tempSign);
-            } else {
+            } else if(std::ispunct(character) && character != '.') {
                 //Sonderzeichen gefunden außer "."
-                if(character != '.') {
-                    fmt::print("foo: {}\n", character);
-                    tempSign.parsedSign     = character;
-                    tempSign.position       = i;
-                    tempSign.partNumberFlag = false;
-                    parsedSigns.push_back(tempSign);
-                }
+                tempSign.parsedSign.emplace<char>(character);
+                //fmt::print("bar: {}\n", std::get<0>(tempSign.parsedSign));
+                tempSign.position       = i;
+                tempSign.partNumberFlag = false;
+                parsedSigns.push_back(tempSign);
             }
-            fmt::print("{}:{} {}\n", i, character, std::ispunct(character));
             ++i;
         }
-        fmt::print("{}\n\n", str);
+        fmt::print("{}\n", str);
     };
 
     while(std::getline(fileHandle, line)) {
         parseFunction(line);
     }
-
-    for(auto const& signs : parsedSigns){
-        fmt::print("{}\n", signs.parsedSign);
-
-    }
-
 }
